@@ -39,26 +39,66 @@ public class RxJavaManager {
                 .subscribe(subscriber);
     }
 
-    public void okHttpResponse(String url) {
+    public void okHttpResponse() {
         // RxJava2 + OkHttp
-        Observable.create(new ObservableOnSubscribe<Response>() {
+        // 方法一
+//        Observable.create(new ObservableOnSubscribe<Response>() {
+//            @Override
+//            public void subscribe(@NonNull ObservableEmitter<Response> emitter) throws Exception {
+//                OkHttpClient client = new OkHttpClient();
+//                Request request = new Request.Builder()
+//                        .url("網址")
+//                        .get()
+//                        .build();
+//                Response response = client.newCall(request).execute();
+//                emitter.onNext(response);
+//                emitter.onComplete();
+//            }
+//        })
+//                .subscribeOn(Schedulers.newThread())
+//                .observeOn(Schedulers.io())
+//                .map(new Function<Response, String>() {
+//                    @Override
+//                    public String apply(@NonNull Response response) throws Exception {
+//                        if (response.isSuccessful()) {
+//                            return response.body().string();
+//                        }
+//                        return null;
+//                    }
+//                })
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Consumer<String>() {
+//                    @Override
+//                    public void accept(String result) throws Exception {
+//                        Log.d(TAG, "response success: " + result);
+//                    }
+//                }, new Consumer<Throwable>() {
+//                    @Override
+//                    public void accept(@NonNull Throwable throwable) throws Exception {
+//                        Log.e(TAG, "response failed： " + throwable.getMessage());
+//                    }
+//                });
+
+        // 方法二
+        Observable.create(new ObservableOnSubscribe<String>() {
             @Override
-            public void subscribe(@NonNull ObservableEmitter<Response> emitter) throws Exception {
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder()
-                        .url(url)
-                        .get()
-                        .build();
-                Response response = client.newCall(request).execute();
-                emitter.onNext(response);
-                emitter.onComplete();
+            public void subscribe(@NonNull ObservableEmitter<String> url) throws Exception {
+                url.onNext("https://coa.emct.tw/S2K5/api/Code/" + "Surface");
+                url.onNext("https://coa.emct.tw/S2K5/api/Code/" + "Phenology");
+                url.onComplete();
             }
         })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.io())
-                .map(new Function<Response, String>() {
+                .map(new Function<String, String>() {
                     @Override
-                    public String apply(@NonNull Response response) throws Exception {
+                    public String apply(@NonNull String url) throws Exception {
+                        OkHttpClient client = new OkHttpClient();
+                        Request request = new Request.Builder()
+                                .url((String) url)
+                                .get()
+                                .build();
+                        Response response = client.newCall(request).execute();
                         if (response.isSuccessful()) {
                             return response.body().string();
                         }
@@ -68,9 +108,13 @@ public class RxJavaManager {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<String>() {
                     @Override
-                    public void accept(String s) throws Exception {
-                        Log.d(TAG, "accept: " + s);
-                        SurfaceObj[] gson = new Gson().fromJson(s, SurfaceObj[].class);
+                    public void accept(String result) throws Exception {
+                        Log.d(TAG, "response success: " + result);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(@NonNull Throwable throwable) throws Exception {
+                        Log.e(TAG, "response failed： " + throwable.getMessage());
                     }
                 });
     }

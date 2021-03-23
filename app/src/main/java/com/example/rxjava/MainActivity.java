@@ -13,6 +13,7 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import io.reactivex.BackpressureStrategy;
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.button1:
+            case R.id.button1: // 正規寫法
                 /**
                  * Observable subscribe to Observer
                  */
@@ -144,7 +145,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 rxJavaManager.toSubscriber(flowable, subscriber);
                 break;
 
-            case R.id.button2:
+            case R.id.button2: // 偷懶寫法
+                Observable.create(new ObservableOnSubscribe<String>() {
+                    @Override
+                    public void subscribe(@NonNull ObservableEmitter<String> e) {
+                        e.onNext("Hello");
+                        e.onNext("Hi");
+                        e.onNext("Aloha");
+                        e.onComplete();
+                    }
+                })
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Observer<String>() {
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+                                Log.d(TAG, "onSubscribe: " + d);
+                            }
+
+                            @Override
+                            public void onNext(String s) {
+                                Log.d(TAG, "Item: " + s);
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                Log.d(TAG, "Completed!");
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Log.d(TAG, "Error!");
+                            }
+                        });
+
                 /**
                  * buffer
                  */
@@ -175,10 +209,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                             }
                         });
+
                 /**
                  * range
                  */
                 Flowable.range(1, 4)
+                        .delay(1, TimeUnit.SECONDS)
                         //.subscribeOn(Schedulers.io())
                         //.observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Subscriber<Integer>() {
@@ -203,38 +239,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                             }
                         });
-//                Observable.create(new ObservableOnSubscribe<String>() {
-//                    @Override
-//                    public void subscribe(@NonNull ObservableEmitter<String> e) {
-//                        e.onNext("Hello");
-//                        e.onNext("Hi");
-//                        e.onNext("Aloha");
-//                        e.onComplete();
-//                    }
-//                })
-//                        .subscribeOn(Schedulers.io())
-//                        .observeOn(AndroidSchedulers.mainThread())
-//                        .subscribe(new Observer<String>() {
-//                            @Override
-//                            public void onSubscribe(@NonNull Disposable d) {
-//                                Log.d(TAG, "onSubscribe: " + d);
-//                            }
-//
-//                            @Override
-//                            public void onNext(String s) {
-//                                Log.d(TAG, "Item: " + s);
-//                            }
-//
-//                            @Override
-//                            public void onComplete() {
-//                                Log.d(TAG, "Completed!");
-//                            }
-//
-//                            @Override
-//                            public void onError(Throwable e) {
-//                                Log.d(TAG, "Error!");
-//                            }
-//                        });
                 break;
             case R.id.button3:
 //                Observable.just("logo")
@@ -283,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                        });
                 break;
             case R.id.button5:
-                rxJavaManager.okHttpResponse("https://coa.emct.tw/S2K5/api/Code/" + "Surface");
+                rxJavaManager.okHttpResponse();
                 break;
         }
     }
