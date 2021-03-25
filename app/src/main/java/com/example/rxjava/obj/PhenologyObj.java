@@ -4,15 +4,15 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class SurfaceObj implements Serializable {
+public class PhenologyObj implements Serializable {
 
-    @SerializedName("Surface_id")
-    private int surfaceId;
+    @SerializedName("Phenology_id")
+    private int phenologyId;
     @SerializedName("Name")
     private String name;
 
-    public int getSurfaceId() {
-        return surfaceId;
+    public int getPhenologyId() {
+        return phenologyId;
     }
 
     public String getName() {

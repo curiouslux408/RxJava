@@ -14,7 +14,6 @@ import org.reactivestreams.Subscription;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
@@ -34,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private String TAG = "MainActivity";
     private Button button1, button2, button3, button4;
-    private Button button5, button6, button7, button8;
+    private Button button5;
     private RxJavaManager rxJavaManager;
 
     @Override
@@ -54,13 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button3.setOnClickListener(this);
         button4.setOnClickListener(this);
         button5 = findViewById(R.id.button5);
-        //button6 = findViewById(R.id.button6);
-        //button7 = findViewById(R.id.button7);
-        //button8 = findViewById(R.id.button8);
         button5.setOnClickListener(this);
-        //button6.setOnClickListener(this);
-        //button7.setOnClickListener(this);
-        //button8.setOnClickListener(this);
     }
 
     @Override
@@ -85,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        Log.d(TAG, "onError: " + e);
+                        Log.e(TAG, "onError: " + e.getMessage());
                     }
 
                     @Override
@@ -124,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d(TAG, "Error!");
+                        Log.e(TAG, "onError: " + e.getMessage());
                     }
 
                     @Override
@@ -170,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                             @Override
                             public void onComplete() {
-                                Log.d(TAG, "Completed!");
+                                Log.d(TAG, "Complete!");
                             }
 
                             @Override
@@ -287,7 +280,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                        });
                 break;
             case R.id.button5:
-                rxJavaManager.okHttpResponse();
+                rxJavaManager.retrofitResponse();
+                //rxJavaManager.okHttpResponse(ApiService.baseUrl + "Surface", ApiService.baseUrl + "Phenology");
                 break;
         }
     }
