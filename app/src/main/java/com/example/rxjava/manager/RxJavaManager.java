@@ -16,6 +16,7 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -27,6 +28,7 @@ import okhttp3.Response;
 public class RxJavaManager {
 
     private String TAG = "RxJavaManager";
+    private Disposable mDisposable;
 
     /**
      * RxJava2 + Retrofit
@@ -61,7 +63,7 @@ public class RxJavaManager {
         Observable<SurfaceObj[]> observable1 = RetrofitManager.getApiService().getSurface();
         Observable<PhenologyObj[]> observable2 = RetrofitManager.getApiService().getPhenology();
 
-        Observable.zip(observable1, observable2, new BiFunction<SurfaceObj[], PhenologyObj[], Boolean>() {
+        mDisposable = Observable.zip(observable1, observable2, new BiFunction<SurfaceObj[], PhenologyObj[], Boolean>() {
             @NonNull
             @Override
             public Boolean apply(@NonNull SurfaceObj[] result1, @NonNull PhenologyObj[] result2) throws Exception {
@@ -88,7 +90,7 @@ public class RxJavaManager {
      * RxJava2 + OkHttp
      */
     public void okHttpResponse(String url1, String url2) {
-        Observable.create(new ObservableOnSubscribe<String>() {
+        mDisposable = Observable.create(new ObservableOnSubscribe<String>() {
             @Override
             public void subscribe(@NonNull ObservableEmitter<String> url) throws Exception {
                 url.onNext(url1);
@@ -142,5 +144,11 @@ public class RxJavaManager {
         flowable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(subscriber);
+    }
+
+    public void dispose() {
+        if (mDisposable != null) {
+            mDisposable.dispose();
+        }
     }
 }
